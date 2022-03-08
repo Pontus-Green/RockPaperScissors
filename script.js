@@ -1,26 +1,36 @@
+//Global variables
 const weaponss = ["rock", "paper", "scissors"];
+const WINNINGSCORE = 5;
+let playerScore = 0;
+let computerScore = 0;
+let PLAYING = true;
+let resetExecution = false;
+
+// UI update queries
+let playerScoreUI = document.getElementById("playerScore");
+let computerScoreUI = document.getElementById("computerScore");
+let resultUItext = document.getElementById("resultText");
+let resultUI = document.querySelector("div.result");
+const buttons = document.querySelectorAll("div.buttons > button");
+// Reset button queries
+let resetDiv = document.createElement('div');
+let resetButton = document.createElement('button');
+
 
 function computerPlay(weapons = weaponss){
-    return weapons[Math.floor(Math.random()*3)];
-}
+    //weapon choice
+    let chosenWeapon = weapons[Math.floor(Math.random()*3)];
 
-function playerPlay(weapons = weaponss){
-    let playerChoice = prompt("Choose your weapon, rock, paper or scissors!");
-    if(playerChoice == null){
-        alert("You chose nothing");
-        return;
-    }
-    else if (!weapons.includes(playerChoice.toLowerCase())){
-        alert("You chose an illegal weapon!");
-        return;
-    } else {
-        return playerChoice;
-    }
+    //update picture in html
+    let image = document.getElementById("computerWeapon");
+    image.src = `./images/${chosenWeapon}.png`;
+    
+    return chosenWeapon;
 }
 
 function playRound(playerChoice, computerChoice){
     //Logic handling
-    if(playerChoice){
+    if(PLAYING){
         if(playerChoice == "rock" && computerChoice =="paper"){
             console.log("Computer wins!!");
             return "loss";
@@ -44,40 +54,96 @@ function playRound(playerChoice, computerChoice){
             return "win";
         } else{
             console.log("It's a draw..");
-            return;
+            return "draw";
         }
     } else{
         console.log("Game was not played!");
     }
 }
 
-function game(){
-    let playerWins = 0;
-    let computerWins = 0;
-    for(let i = 0; i < 5; i++){
-        //player chooses
-        let playerChoice = playerPlay();
-        
-        //computer chooses
-        let computerChoice = computerPlay();
-        
-
-        //printing out the chosen weapons
-        console.log(`You chose: ${playerChoice}`);
-        console.log(`Computer chose: ${computerChoice}`);
-
-        let outcome = playRound(playerChoice, computerChoice);
-        if(outcome == "win"){
-            playerWins++;
-        } else if(outcome =="loss"){
-            computerWins++;
-        }
-
-        //score
-        console.log(`Player wins: ${playerWins}`);
-        console.log(`Computer wins: ${computerWins}`);
-
+function checkWinner(result){
+    if(result == "loss"){
+        computerScore += 1;
+        return true;
+    } else if(result == "win"){
+        playerScore +=1;
+        return true;
     }
 }
 
-game();
+function updateResults(result){
+    playerScoreUI.textContent = `Player score: ${playerScore}`;
+    computerScoreUI.textContent = `Computer score: ${computerScore}`;
+    console.log(result);
+    switch (result){
+        case 'win':
+            resultUItext.textContent = "You won!!";
+            resultUI.style.backgroundColor ="Green";
+            break;
+        case 'loss':
+            resultUItext.textContent = "You lost!!";
+            resultUI.style.backgroundColor = "Red";
+            break;
+        case 'draw':
+            resultUItext.textContent = "It's a draw..";
+            resultUI.style.backgroundColor = "yellow";
+            break;
+        default:
+            console.log("I dont even exist :(");
+    }
+}
+
+let resetDivCreation = (function resetDivCreation(result){
+    return function(result){
+        if(!resetExecution) {
+            switch(result){
+                case 'win':
+                    resetDiv.textContent = "Wow you are such a winner, play again?";
+                    break;
+                case 'loss':
+                    resetDiv.textContent = "whoawee you are such a loser, play again?";
+                    break;
+            }
+            resetButton.textContent ="Reset Game";
+            resetDiv.classList.add("resetStyle");
+
+        resetDiv.appendChild(resetButton);
+        document.body.appendChild(resetDiv);
+        resetExecution = true;
+        }
+    };
+})();
+
+
+buttons.forEach((button) => {
+    //for each button we add a listener
+        button.addEventListener('click', () => {
+            if (playerScore == 5 || computerScore ==5){
+                PLAYING = false;
+            }
+            if(PLAYING){
+                playerChoice = button.id;
+                let image = document.getElementById("playerWeapon");
+                image.src=`./images/${button.id}.png`;
+
+                let result = playRound(playerChoice,computerPlay());
+                checkWinner(result);
+                updateResults(result);
+                if ((result == "win" && playerScore == 5) || (result == "loss" && computerScore == 5)){
+                    console.log(result);
+                    resetDivCreation(result);
+                }
+            }
+        });
+});
+
+resetButton.addEventListener('click', () => {
+    document.body.removeChild(resetDiv);
+    playerScore = 0;
+    computerScore = 0;
+    PLAYING = true;
+    resetExecution = false;
+    resultUItext.textContent = "Go";
+    resultUI.style.backgroundColor = "white";
+    updateResults();
+});
