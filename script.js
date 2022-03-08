@@ -23,25 +23,25 @@ function playRound(playerChoice, computerChoice){
     if(playerChoice){
         if(playerChoice == "rock" && computerChoice =="paper"){
             console.log("Computer wins!!");
-            return;
+            return "loss";
         }
         else if(playerChoice == "rock" && computerChoice =="scissors"){
             console.log("You win!");
-            return;
+            return "win";
         }
         else if(playerChoice =="paper" && computerChoice == "rock"){
             console.log("You win!");
-            return;
+            return "win";
         }
         else if(playerChoice =="scissors" && computerChoice == "rock"){
             console.log("Computer wins!!");
-            return;
+            return "loss";
         } else if(playerChoice == "paper" && computerChoice =="scissors"){
             console.log("Computer wins!!");
-            return;
+            return "loss";
         } else if(playerChoice =="scissors" && computerChoice == "paper"){
             console.log("You win!");
-            return;
+            return "win";
         } else{
             console.log("It's a draw..");
             return;
@@ -51,16 +51,33 @@ function playRound(playerChoice, computerChoice){
     }
 }
 
+function game(){
+    let playerWins = 0;
+    let computerWins = 0;
+    for(let i = 0; i < 5; i++){
+        //player chooses
+        let playerChoice = playerPlay();
+        
+        //computer chooses
+        let computerChoice = computerPlay();
+        
 
-for(let i = 0; i < 5; i++){
-    //player chooses
-    let playerChoice = playerPlay();
-    //computer chooses
-    let computerChoice = computerPlay();
+        //printing out the chosen weapons
+        console.log(`You chose: ${playerChoice}`);
+        console.log(`Computer chose: ${computerChoice}`);
 
-    //printing out the chosen weapons
-    console.log(`You chose: ${playerChoice}`);
-    console.log(`Computer chose: ${computerChoice}`);
+        let outcome = playRound(playerChoice, computerChoice);
+        if(outcome == "win"){
+            playerWins++;
+        } else if(outcome =="loss"){
+            computerWins++;
+        }
 
-    playRound(playerChoice, computerChoice);
+        //score
+        console.log(`Player wins: ${playerWins}`);
+        console.log(`Computer wins: ${computerWins}`);
+
+    }
 }
+
+game();
